@@ -1,0 +1,65 @@
+[tool.poetry]
+name = "memes-gpt"
+version = "0.1.0"
+description = ""
+authors = ["Punches <punche@yandex.ru>"]
+readme = "README.md"
+
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.110.0"
+uvicorn = "^0.24.0.post1"
+pydantic-settings = "^2.2.1"
+orjson = "^3.9.10"
+faker = "^24.0.0"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.3.1"
+mypy = "^1.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+exclude = [
+    ".idea",
+    ".git",
+    ".venv",
+    "tests",
+]
+fix = true
+unsafe-fixes = true
+line-length = 120
+lint.select = ["ALL"]
+lint.ignore = [
+    "D1", "D203", "D213", "FA102", "ANN101", "RUF001", "RUF002", "RUF003", "FIX002", "A003", "E712", "PGH003", "ARG002",
+    "ANN102"
+]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.ruff.lint.isort]
+no-lines-before = ["standard-library", "local-folder"]
+known-local-folder = []
+
+[tool.ruff.lint.extend-per-file-ignores]
+"tests/*.py" = ["ANN401", "S101", "S311"]
+
+[tool.ruff.lint.flake8-type-checking]
+runtime-evaluated-decorators = ["pydantic.validate_call", "attrs.define"]
+runtime-evaluated-base-classes = ["pydantic.BaseModel"]
+
+[tool.mypy]
+mypy_path = "./"
+python_version = "3.11"
+ignore_missing_imports = true
+exclude = ".venv"
+plugins = []
+
+[tool.pytest.ini_options]
+minversion = "7.4"
+addopts = "-vs -q"
