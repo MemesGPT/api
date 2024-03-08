@@ -5,7 +5,8 @@ import logging
 import fastapi
 import uvicorn
 
-import lib.api.fastapi.rest.v1.health as health_api
+import lib.api.rest.v1.health as health_api
+import lib.api.rest.v1.promt as promt_api
 import lib.app.fastapi.errors as app_errors
 import lib.app.fastapi.settings as app_settings
 
@@ -32,12 +33,16 @@ class Application:
 
         logger.info("Initializing handlers")
         liveness_probe_handler = health_api.LivenessProbeHandler()
+        promt_detail_handler = promt_api.PromtDetailHandler()
+        promt_create_handler = promt_api.PromtCreateHandler()
 
         logger.info("Creating fastapi application")
         fastapi_app = fastapi.FastAPI()
 
         logger.info("Initializing routes")
         fastapi_app.get("/api/v1/health/liveness")(liveness_probe_handler.process)
+        fastapi_app.get("/api/v1/promt")(promt_detail_handler.process)
+        fastapi_app.post("/api/v1/promt")(promt_create_handler.process)
 
         logger.info("Creating application")
         application = Application(
