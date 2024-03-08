@@ -1,4 +1,5 @@
 import typing
+import uuid
 
 import faker
 
@@ -9,14 +10,14 @@ faker.Faker.seed(1234)
 
 
 class PromtDetailHandlerProtocol(typing.Protocol):
-    async def process(self) -> promt_schemes.PromtScheme:
+    async def process(self, promt_id: uuid.UUID) -> promt_schemes.PromtScheme:
         ...
 
 
 class PromtDetailHandler(PromtDetailHandlerProtocol):
-    async def process(self) -> promt_schemes.PromtScheme:
+    async def process(self, promt_id: uuid.UUID) -> promt_schemes.PromtScheme:
         return promt_schemes.PromtScheme(
-            id=fake.uuid4(),
+            id=promt_id,
             text=fake.sentence(nb_words=10),
         )
 
