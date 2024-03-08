@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  postgres_master:
+    volumes:
+      - postgres_master_data:/var/lib/postgresql/data
+
+  redis_master:
+    volumes:
+      - redis_master_data:/data
+
+volumes:
+  postgres_master_data:
+    driver: local
+
+  redis_master_data:
+    driver: local
