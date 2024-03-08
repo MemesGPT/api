@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  memes_api:
+    build: ../../backend
+    expose:
+      - "${SERVER_PORT}"
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    env_file:
+      - ./.env
