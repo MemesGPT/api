@@ -1,8 +1,18 @@
 FROM python:3.11.8-slim AS builder
 
-COPY . /opt/backend
+ENV POETRY_HOME="/opt/poetry" \
+    POETRY_VIRTUALENVS_IN_PROJECT=1 \
+    POETRY_NO_INTERACTION=1
+ENV PATH="$POETRY_HOME/bin:$PATH"
+
 WORKDIR /opt/backend
 
+RUN  pip install --no-cache-dir --upgrade pip \
+     && apt-get -y update && apt-get -y install gcc libpq-dev python3-dev \
+     && apt-get install -y --no-install-recommends curl \
+     && curl -sSL https://install.python-poetry.org | python3 -
+
+COPY . /opt/backend
 RUN poetry install --no-dev
 
 FROM python:3.11.8-slim AS runtime

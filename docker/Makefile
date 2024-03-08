@@ -6,20 +6,20 @@ COMPOSE_DEV_FILE=compose/docker-compose.dev.yml
 
 .PHONY: dev-build
 dev-build:
-	$(COMPOSE_ENV) docker compose -f $(COMPOSE_BASE_FILE) -f $(COMPOSE_DEV_FILE) build
+	$(COMPOSE_ENV) docker compose -f $(COMPOSE_BASE_FILE) --env-file compose/.env.dev build
 
 .PHONY: dev-start
 dev-start:
-	$(COMPOSE_ENV) docker compose -f $(COMPOSE_BASE_FILE) -f $(COMPOSE_DEV_FILE) up --detach
+	$(COMPOSE_ENV) docker compose -f $(COMPOSE_BASE_FILE) --env-file compose/.env.dev up --detach
 
 .PHONY: dev-stop
 dev-stop:
-	$(COMPOSE_ENV) docker compose -f $(COMPOSE_BASE_FILE) -f $(COMPOSE_DEV_FILE) down
+	$(COMPOSE_ENV) docker compose -f $(COMPOSE_BASE_FILE) down
 
 .PHONY: dev-clean
 dev-clean:
-	$(COMPOSE_ENV) docker compose -f $(COMPOSE_BASE_FILE) -f $(COMPOSE_DEV_FILE) down --volumes
+	$(COMPOSE_ENV) docker compose -f $(COMPOSE_BASE_FILE) down --volumes
 
 .PHONY: dev-show-logs
 dev-show-logs:
-	$(COMPOSE_ENV) docker compose -f $(COMPOSE_BASE_FILE) -f $(COMPOSE_DEV_FILE) logs --follow
+	$(COMPOSE_ENV) docker compose -f $(COMPOSE_BASE_FILE) logs --follow

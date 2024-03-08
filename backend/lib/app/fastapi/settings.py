@@ -23,8 +23,8 @@ class Settings(pydantic_settings.BaseSettings):
     LOGS_FORMAT: str = "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
 
     # Server
-    SERVER_HOST: str = "127.0.0.1"
-    SERVER_PORT: int = 8081
+    SERVER_HOST: str
+    SERVER_PORT: int
 
     @property
     def is_development(self) -> bool:
