@@ -50,9 +50,9 @@ jobs:
           script: |
             export PATH=$PATH:$YC_PATH
             docker pull cr.yandex/$CR_REGISTRY/$CR_REPO:$SHORT_SHA
-            docker stop $CR_REPO
-            docker rm $CR_REPO
-            docker images -a | grep $CR_REPO | grep -v $SHORT_SHA | awk '{print $3}' | xargs docker rmi
+            docker stop $CR_REPO || true
+            docker rm $CR_REPO || true
+            docker images -a | grep $CR_REPO | grep -v $SHORT_SHA | awk '{print $3}' | xargs docker rmi || true
             docker run --detach --network $NETWORK --restart always --name $CR_REPO cr.yandex/$CR_REGISTRY/$CR_REPO:$SHORT_SHA
 
   send_message:
