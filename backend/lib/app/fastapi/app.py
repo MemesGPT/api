@@ -40,9 +40,11 @@ class Application:
         fastapi_app = fastapi.FastAPI()
 
         logger.info("Initializing routes")
-        fastapi_app.get("/api/v1/health/liveness")(liveness_probe_handler.process)
-        fastapi_app.get("/api/v1/promt")(promt_detail_handler.process)
-        fastapi_app.post("/api/v1/promt")(promt_create_handler.process)
+        # ping
+        fastapi_app.get("/api/v1/health/liveness", tags=["ping"])(liveness_probe_handler.process)
+        # promt
+        fastapi_app.post("/api/v1/promt", tags=["promt"])(promt_create_handler.process)
+        fastapi_app.get("/api/v1/promt/{promt_id}", tags=["promt"])(promt_detail_handler.process)
 
         logger.info("Creating application")
         application = Application(
