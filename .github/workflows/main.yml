@@ -6,7 +6,7 @@ env:
     CR_REGISTRY: "${{ secrets.CR_REGISTRY }}"
     CR_REPO: "${{ secrets.CR_REPO }}"
     IMAGE_TAG: "${{ github.sha }}"
-    YC_PATH: "/home/${{ secrets.USER }}/yandex-cloud/bin"
+    YC_PATH: "/home/${{ secrets.MEMES_HOST_USER }}/yandex-cloud/bin"
     NETWORK: "memes_gpt_net"
 
 
