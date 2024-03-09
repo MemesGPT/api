@@ -53,7 +53,12 @@ jobs:
             docker stop $CR_REPO || true
             docker rm $CR_REPO || true
             docker images -a | grep $CR_REPO | grep -v $SHORT_SHA | awk '{print $3}' | xargs docker rmi || true
-            docker run --detach --network $NETWORK --restart always --name $CR_REPO cr.yandex/$CR_REGISTRY/$CR_REPO:$SHORT_SHA
+            docker run --detach --network $NETWORK --restart always \
+              --env SERVER_HOST='0.0.0.0' \
+              --env SERVER_PORT='8081' \
+              -p 8081:8081 \
+              --name $CR_REPO \
+              cr.yandex/$CR_REGISTRY/$CR_REPO:$SHORT_SHA
 
   send_message:
     runs-on: ubuntu-latest
