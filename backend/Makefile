@@ -1,3 +1,6 @@
+ENVFILE = ../docker/compose/.env.dev
+include $(ENVFILE)
+
 PENV = .venv
 PYTHON = $(PENV)/bin/python
 
@@ -17,7 +20,7 @@ lint:
 .PHONY: dev-server-start
 dev-server-start:
 	@echo 'Starting dev server...'
-	@$(PYTHON) -m bin.web
+	@SERVER_HOST=$(SERVER_HOST) SERVER_PORT=$(SERVER_PORT) $(PYTHON) -m bin.web
 
 .PHONY: test
 test:

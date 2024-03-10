@@ -1,6 +1,8 @@
-name: memes_gpt_CI
+name: memes_gpt_CD
 
-on: [pull_request]
+on:
+  push:
+    branches: [ develop, main ]
 
 env:
     CR_REGISTRY: "${{ secrets.CR_REGISTRY }}"
