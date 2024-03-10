@@ -1,0 +1,53 @@
+name: memes_gpt_CI
+
+on: [pull_request]
+
+jobs:
+  linters:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up python
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          virtualenvs-path: backend/.venv
+          installer-parallel: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: backend/.venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: |
+          cd backend
+          poetry install --no-interaction --no-root
+
+      - name: Install project
+        run: |
+          cd backend
+          poetry install --no-interaction
+
+      - name: Run linters
+        run: |
+          cd backend
+          source .venv/bin/activate
+          python -m ruff check ./
+
+      - name: Run tests
+        run: |
+          cd backend
+          source .venv/bin/activate
+          pytest tests/
