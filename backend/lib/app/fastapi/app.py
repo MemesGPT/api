@@ -4,6 +4,9 @@ import logging
 
 import fastapi
 import uvicorn
+from langchain.chat_models import ChatOpenAI, GigaChat
+from langchain.prompts import ChatPromptTemplate
+from langserve import add_routes
 
 import lib.api.rest.v1.health as health_api
 import lib.api.rest.v1.promt as promt_api
@@ -45,6 +48,31 @@ class Application:
         # promt
         fastapi_app.post("/api/v1/promt", tags=["promt"])(promt_create_handler.process)
         fastapi_app.get("/api/v1/promt/{promt_id}", tags=["promt"])(promt_detail_handler.process)
+
+        add_routes(
+            app=fastapi_app,
+            runnable=GigaChat(credentials=settings.GIGACHAT_API_KEY, scope="GIGACHAT_API_PERS", verify_ssl_certs=False),
+            path="/gigachat",
+        )
+
+        add_routes(
+            fastapi_app,
+            ChatOpenAI(openai_api_key=settings.OPENAI_API_KEY),
+            path="/openai",
+        )
+
+        prompt = ChatPromptTemplate.from_template("расскажи шутку о {topic}")
+        add_routes(
+            app=fastapi_app,
+            runnable=prompt,
+            path="/joke",
+        )
+
+        add_routes(
+            app=fastapi_app,
+            runnable=GigaChat(credentials=settings.GIGACHAT_API_KEY, scope="GIGACHAT_API_PERS", verify_ssl_certs=False),
+            path="/my_runnable",
+        )
 
         logger.info("Creating application")
         application = Application(

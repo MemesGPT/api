@@ -8,17 +8,21 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.110.0"
-uvicorn = "^0.24.0.post1"
-pydantic-settings = "^2.2.1"
 orjson = "^3.9.10"
 faker = "^24.0.0"
+gigachain = "^0.1.10"
+gigachat = "^0.1.19"
+uvicorn = "^0.23.0"
+gigachain-cli = "^0.0.21"
+fastapi = "0.99.1"
+openai = "^1.13.3"
 
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.3.1"
 mypy = "^1.8.0"
 pytest = "^8.1.1"
+pytest-asyncio = "^0.23.5.post1"
 
 [build-system]
 requires = ["poetry-core"]
@@ -31,7 +35,7 @@ exclude = [
     ".venv",
     "tests",
 ]
-fix = true
+fix = false
 unsafe-fixes = true
 line-length = 120
 lint.select = ["ALL"]

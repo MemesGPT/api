@@ -1,7 +1,7 @@
 import dataclasses
 import typing
 
-import pydantic_settings
+import pydantic
 
 LogLevel = typing.Literal["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"]
 
@@ -12,7 +12,7 @@ class HTTPEndpoint:
     method: str
 
 
-class Settings(pydantic_settings.BaseSettings):
+class Settings(pydantic.BaseSettings):
     # App
     APP_ENV: str = "development"
     APP_NAME: str = "memes-gpt/backend"
@@ -25,6 +25,10 @@ class Settings(pydantic_settings.BaseSettings):
     # Server
     SERVER_HOST: str
     SERVER_PORT: int
+
+    # openai
+    OPENAI_API_KEY: str
+    GIGACHAT_API_KEY: str
 
     @property
     def is_development(self) -> bool:

@@ -1,4 +1,4 @@
-ENVFILE = ../docker/compose/.env.dev
+ENVFILE = ../docker/compose/.env
 include $(ENVFILE)
 
 PENV = .venv
@@ -20,7 +20,11 @@ lint:
 .PHONY: dev-server-start
 dev-server-start:
 	@echo 'Starting dev server...'
-	@SERVER_HOST=$(SERVER_HOST) SERVER_PORT=$(SERVER_PORT) $(PYTHON) -m bin.web
+	@SERVER_HOST=$(SERVER_HOST) \
+		SERVER_PORT=$(SERVER_PORT) \
+		OPENAI_API_KEY=$(OPENAI_API_KEY) \
+		GIGACHAT_API_KEY=$(GIGACHAT_API_KEY) \
+		$(PYTHON) -m bin.web
 
 .PHONY: test
 test:

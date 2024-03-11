@@ -58,6 +58,8 @@ jobs:
             docker run --detach --network $NETWORK --restart always \
               --env SERVER_HOST='0.0.0.0' \
               --env SERVER_PORT='8081' \
+              --env OPENAI_API_KEY='${{ secrets.OPENAI_API_KEY }}' \
+              --env GIGACHAT_API_KEY='${{ secrets.GIGACHAT_API_KEY }}' \
               -p 8081:8081 \
               --name $CR_REPO \
               cr.yandex/$CR_REGISTRY/$CR_REPO:$SHORT_SHA
