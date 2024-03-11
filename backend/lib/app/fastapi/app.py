@@ -3,10 +3,10 @@ import asyncio
 import logging
 
 import fastapi
+import langchain.chat_models as ai_chat_models
+import langchain.prompts as lg_prompts
+import langserve
 import uvicorn
-from langchain.chat_models import ChatOpenAI, GigaChat
-from langchain.prompts import ChatPromptTemplate
-from langserve import add_routes
 
 import lib.api.rest.v1.health as health_api
 import lib.api.rest.v1.promt as promt_api
@@ -49,29 +49,34 @@ class Application:
         fastapi_app.post("/api/v1/promt", tags=["promt"])(promt_create_handler.process)
         fastapi_app.get("/api/v1/promt/{promt_id}", tags=["promt"])(promt_detail_handler.process)
 
-        add_routes(
+        logger.info("Initializing chat_models")
+        gigachat_model = ai_chat_models.GigaChat(
+            credentials=settings.GIGACHAT_API_KEY,
+            scope="GIGACHAT_API_PERS",
+            verify_ssl_certs=False,
+        )
+        openapi_model = ai_chat_models.ChatOpenAI(
+            openai_api_key=settings.OPENAI_API_KEY,
+        )
+        jouke_prompt = lg_prompts.ChatPromptTemplate.from_template("расскажи шутку о {topic}")
+
+        logger.info("Initializing langserve routes")
+        langserve.add_routes(
             app=fastapi_app,
-            runnable=GigaChat(credentials=settings.GIGACHAT_API_KEY, scope="GIGACHAT_API_PERS", verify_ssl_certs=False),
+            runnable=gigachat_model,
             path="/gigachat",
         )
 
-        add_routes(
-            fastapi_app,
-            ChatOpenAI(openai_api_key=settings.OPENAI_API_KEY),
+        langserve.add_routes(
+            app=fastapi_app,
+            runnable=openapi_model,
             path="/openai",
         )
 
-        prompt = ChatPromptTemplate.from_template("расскажи шутку о {topic}")
-        add_routes(
+        langserve.add_routes(
             app=fastapi_app,
-            runnable=prompt,
+            runnable=jouke_prompt | gigachat_model,
             path="/joke",
-        )
-
-        add_routes(
-            app=fastapi_app,
-            runnable=GigaChat(credentials=settings.GIGACHAT_API_KEY, scope="GIGACHAT_API_PERS", verify_ssl_certs=False),
-            path="/my_runnable",
         )
 
         logger.info("Creating application")
