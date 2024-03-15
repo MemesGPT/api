@@ -3,15 +3,18 @@ import asyncio
 import logging
 
 import fastapi
+import httpx
 import langchain.chat_models as ai_chat_models
-import langchain.prompts as lg_prompts
+import langchain_openai
 import langserve
 import uvicorn
 
+import lib.api.rest.v1.dalle as dalle_api
 import lib.api.rest.v1.health as health_api
 import lib.api.rest.v1.promt as promt_api
 import lib.app.fastapi.errors as app_errors
 import lib.app.fastapi.settings as app_settings
+import lib.dalle.serveces as dalle_serveces
 
 logger = logging.getLogger(__name__)
 
@@ -34,10 +37,24 @@ class Application:
 
         logger.info("Initializing application")
 
+        logger.info("Initializing chat_models")
+        dalle_llm = langchain_openai.OpenAI(
+            temperature=0.9,
+            timeout=httpx.Timeout(60.0, read=10.0, write=20.0, connect=10.0),
+        )
+
+        openapi_model = ai_chat_models.ChatOpenAI(
+            openai_api_key=settings.OPENAI_API_KEY,
+        )
+
+        logger.info("Initializing services")
+        dalle_service = dalle_serveces.DalleServece(dalle_llm=dalle_llm)
+
         logger.info("Initializing handlers")
         liveness_probe_handler = health_api.LivenessProbeHandler()
         promt_detail_handler = promt_api.PromtDetailHandler()
         promt_create_handler = promt_api.PromtCreateHandler()
+        dalle_create_handler = dalle_api.DalleCreateHandler(dalle_service=dalle_service)
 
         logger.info("Creating fastapi application")
         fastapi_app = fastapi.FastAPI()
@@ -48,24 +65,11 @@ class Application:
         # promt
         fastapi_app.post("/api/v1/promt", tags=["promt"])(promt_create_handler.process)
         fastapi_app.get("/api/v1/promt/{promt_id}", tags=["promt"])(promt_detail_handler.process)
+        # dall-e promt
+        fastapi_app.post("/api/v1/dalle", tags=["OpenAI Dall-E"])(dalle_create_handler.process)
 
-        logger.info("Initializing chat_models")
-        gigachat_model = ai_chat_models.GigaChat(
-            credentials=settings.GIGACHAT_API_KEY,
-            scope="GIGACHAT_API_PERS",
-            verify_ssl_certs=False,
-        )
-        openapi_model = ai_chat_models.ChatOpenAI(
-            openai_api_key=settings.OPENAI_API_KEY,
-        )
-        jouke_prompt = lg_prompts.ChatPromptTemplate.from_template("расскажи шутку о {topic}")
 
         logger.info("Initializing langserve routes")
-        langserve.add_routes(
-            app=fastapi_app,
-            runnable=gigachat_model,
-            path="/gigachat",
-        )
 
         langserve.add_routes(
             app=fastapi_app,
@@ -73,11 +77,6 @@ class Application:
             path="/openai",
         )
 
-        langserve.add_routes(
-            app=fastapi_app,
-            runnable=jouke_prompt | gigachat_model,
-            path="/joke",
-        )
 
         logger.info("Creating application")
         application = Application(
