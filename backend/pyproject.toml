@@ -16,6 +16,11 @@ uvicorn = "^0.23.0"
 gigachain-cli = "^0.0.21"
 fastapi = "0.99.1"
 openai = "^1.13.3"
+opencv-python = "^4.9.0.80"
+scikit-image = "^0.22.0"
+langchain-core = "^0.1.32"
+langchain-community = "^0.0.28"
+langchain-openai = "^0.0.8"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -35,7 +40,7 @@ exclude = [
     ".venv",
     "tests",
 ]
-fix = false
+fix = true
 unsafe-fixes = true
 line-length = 120
 lint.select = ["ALL"]
