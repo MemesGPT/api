@@ -3,18 +3,16 @@ import asyncio
 import logging
 
 import fastapi
-import httpx
-import langchain.chat_models as ai_chat_models
 import langchain_openai
-import langserve
 import uvicorn
 
+import lib.api.rest.v1.chatgpt4 as chatgpt_api
 import lib.api.rest.v1.dalle as dalle_api
 import lib.api.rest.v1.health as health_api
-import lib.api.rest.v1.promt as promt_api
 import lib.app.fastapi.errors as app_errors
 import lib.app.fastapi.settings as app_settings
-import lib.dalle.serveces as dalle_serveces
+import lib.chatgpt.services as chatgpt_services
+import lib.dalle.serveces as dalle_services
 
 logger = logging.getLogger(__name__)
 
@@ -38,23 +36,18 @@ class Application:
         logger.info("Initializing application")
 
         logger.info("Initializing chat_models")
-        dalle_llm = langchain_openai.OpenAI(
-            temperature=0.9,
-            timeout=httpx.Timeout(60.0, read=10.0, write=20.0, connect=10.0),
-        )
-
-        openapi_model = ai_chat_models.ChatOpenAI(
-            openai_api_key=settings.OPENAI_API_KEY,
-        )
+        openai_llm = langchain_openai.OpenAI(temperature=0.9, openai_api_key=settings.OPENAI_API_KEY)
 
         logger.info("Initializing services")
-        dalle_service = dalle_serveces.DalleServece(dalle_llm=dalle_llm)
+        dalle_service = dalle_services.DalleServece(dalle_llm=openai_llm)
+        chatgpt_service = chatgpt_services.ChatGPTServece(chatgpt_llm=openai_llm)
 
         logger.info("Initializing handlers")
         liveness_probe_handler = health_api.LivenessProbeHandler()
-        promt_detail_handler = promt_api.PromtDetailHandler()
-        promt_create_handler = promt_api.PromtCreateHandler()
+        promt_create_handler = health_api.PromtCreateHandler()
+        promt_detail_handler = health_api.PromtDetailHandler()
         dalle_create_handler = dalle_api.DalleCreateHandler(dalle_service=dalle_service)
+        chatgpt_create_handler = chatgpt_api.ChatGPT4CreateHandler(chatgpt_service=chatgpt_service)
 
         logger.info("Creating fastapi application")
         fastapi_app = fastapi.FastAPI()
@@ -62,21 +55,12 @@ class Application:
         logger.info("Initializing routes")
         # ping
         fastapi_app.get("/api/v1/health/liveness", tags=["ping"])(liveness_probe_handler.process)
-        # promt
-        fastapi_app.post("/api/v1/promt", tags=["promt"])(promt_create_handler.process)
-        fastapi_app.get("/api/v1/promt/{promt_id}", tags=["promt"])(promt_detail_handler.process)
-        # dall-e promt
-        fastapi_app.post("/api/v1/dalle", tags=["OpenAI Dall-E"])(dalle_create_handler.process)
+        fastapi_app.post("/api/v1/promt", tags=["ping"])(promt_create_handler.process)
+        fastapi_app.get("/api/v1/promt/{promt_id}", tags=["ping"])(promt_detail_handler.process)
 
-
-        logger.info("Initializing langserve routes")
-
-        langserve.add_routes(
-            app=fastapi_app,
-            runnable=openapi_model,
-            path="/openai",
-        )
-
+        # OpenAI
+        fastapi_app.post("/api/v1/openai/chat", tags=["OpenAI"])(chatgpt_create_handler.process)
+        fastapi_app.post("/api/v1/openai/dalle", tags=["OpenAI"])(dalle_create_handler.process)
 
         logger.info("Creating application")
         application = Application(

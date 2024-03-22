@@ -41,7 +41,7 @@ exclude = [
     "tests",
 ]
 fix = true
-unsafe-fixes = true
+unsafe-fixes = false
 line-length = 120
 lint.select = ["ALL"]
 lint.ignore = [
