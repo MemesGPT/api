@@ -3,7 +3,7 @@ import uuid
 
 import faker
 
-import lib.api.rest.v1.promt.schemes as promt_schemes
+import lib.api.rest.v1.health.schemes as promt_schemes
 
 fake = faker.Faker()
 faker.Faker.seed(1234)
