@@ -1,8 +1,11 @@
-import ssl
 import typing
-import uuid
 
 import aiohttp
+
+import lib.gigachat.clients.schemes as clients_schemes
+import lib.gigachat.config as gigachat_configs
+
+gigachat_config = gigachat_configs.GigachatConfig()
 
 
 class GigachatAuthClientProtocol(typing.Protocol):
@@ -16,24 +19,12 @@ class GigachatAuthClient(GigachatAuthClientProtocol):
         self._token = token
 
     async def fetch_token(self) -> str:
-        url = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
+        url = gigachat_config.auth_url
         payload = "scope=GIGACHAT_API_PERS"
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Accept": "application/json",
-            "RqUID": str(uuid.uuid4()),
-            "Authorization": f"Basic {self._token}",
-        }
-        async with self._provider.post(url=url, data=payload, headers=headers, ssl=self._ssl_context()) as response:
+        headers = clients_schemes.HeaderFetchTokenScheme(authorization=f"Basic {self._token}").dict(by_alias=True)
+        async with self._provider.post(url=url, data=payload, headers=headers, ssl=False) as response:
             result = await response.json()
             return result.get("access_token")
-
-    @staticmethod
-    def _ssl_context() -> ssl.SSLContext:
-        ssl_context = ssl.create_default_context()
-        ssl_context.check_hostname = False
-        ssl_context.verify_mode = ssl.CERT_NONE
-        return ssl_context
 
 
 __all__ = [

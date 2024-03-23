@@ -1,13 +1,15 @@
 import logging
-import ssl
 import typing
 
 import aiohttp
 
 import lib.gigachat.clients.auth as gigachat_auth
+import lib.gigachat.clients.schemes as clients_schemes
+import lib.gigachat.config as gigachat_configs
 import lib.gigachat.utils as gigachat_utils
 
 logger = logging.getLogger(__name__)
+gigachat_config = gigachat_configs.GigachatConfig()
 
 
 class GigachatArtClientProtocol(typing.Protocol):
@@ -33,50 +35,24 @@ class GigachatArtClient(GigachatArtClientProtocol):
         return await self._fetch_image_bytes_by_id(image_id, token)
 
     async def _fetch_image_id_by_promt(self, promt_str: str, token: str) -> str:
-        promt_str = f"Нарисуй {promt_str}"
-        url = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
-        headers = {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "Authorization": "Bearer " + token,
-        }
-        data = {
-            "model": "GigaChat",
-            "messages": [
-                {
-                    "role": "user",
-                    "content": promt_str,
-                },
-            ],
-            "temperature": 1,
-            "top_p": 0.1,
-            "n": 1,
-            "stream": False,
-            "max_tokens": 512,
-            "repetition_penalty": 1,
-            "update_interval": 0,
-        }
-        async with self._provider.post(url=url, headers=headers, json=data, ssl=self._ssl_context()) as response:
+        promt_str = gigachat_config.start_art_promt_template.format(promt_str)
+        url = gigachat_config.chat_completions_url
+        headers = clients_schemes.HeaderFetchImageIdScheme(authorization=f"Bearer {token}").dict(by_alias=True)
+        user_message = clients_schemes.UserMessageScheme(content=promt_str)
+        art_message = clients_schemes.ArtMessageScheme(messages=[user_message]).dict()
+
+        async with self._provider.post(url=url, headers=headers, json=art_message, ssl=False) as response:
             result = await response.json()
             if image_id := gigachat_utils.get_image_id_from_response(result):
                 return image_id
             raise self.GigachatArtImageNotCreatedError
 
     async def _fetch_image_bytes_by_id(self, image_id: str, token: str) -> bytes:
-        url = f"https://gigachat.devices.sberbank.ru/api/v1/files/{image_id}/content"
-        headers = {
-            "Accept": "application/jpg",
-            "Authorization": "Bearer " + token,
-        }
-        async with self._provider.get(url=url, headers=headers, ssl=self._ssl_context()) as response:
-            return await response.read()
+        url = gigachat_config.fetch_img_by_id_url.format(image_id)
+        headers = clients_schemes.HeaderFetchImageScheme(authorization=f"Bearer {token}").dict(by_alias=True)
 
-    @staticmethod
-    def _ssl_context() -> ssl.SSLContext:
-        ssl_context = ssl.create_default_context()
-        ssl_context.check_hostname = False
-        ssl_context.verify_mode = ssl.CERT_NONE
-        return ssl_context
+        async with self._provider.get(url=url, headers=headers, ssl=False) as response:
+            return await response.read()
 
 
 __all__ = [
