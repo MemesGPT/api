@@ -2,17 +2,21 @@ from __future__ import annotations
 import asyncio
 import logging
 
+import aiohttp
 import fastapi
 import langchain_openai
 import uvicorn
 
 import lib.api.rest.v1.chatgpt4 as chatgpt_api
 import lib.api.rest.v1.dalle as dalle_api
+import lib.api.rest.v1.gigachat as gigachat_api
 import lib.api.rest.v1.health as health_api
 import lib.app.fastapi.errors as app_errors
 import lib.app.fastapi.settings as app_settings
 import lib.chatgpt.services as chatgpt_services
 import lib.dalle.serveces as dalle_services
+import lib.gigachat.clients as gigachat_clients
+import lib.gigachat.services as gigachat_services
 
 logger = logging.getLogger(__name__)
 
@@ -22,9 +26,11 @@ class Application:
         self,
         settings: app_settings.Settings,
         fastapi_app: fastapi.FastAPI,
+        aiohttp_client: aiohttp.ClientSession,
     ) -> None:
         self._settings = settings
         self._fastapi_app = fastapi_app
+        self._aiohttp_client = aiohttp_client
 
     @classmethod
     def from_settings(cls, settings: app_settings.Settings) -> Application:
@@ -35,12 +41,26 @@ class Application:
 
         logger.info("Initializing application")
 
+        logger.info("Initializing global clients")
+        aiohttp_client = aiohttp.ClientSession()
+
+        logger.info("Initializing local clients")
+        gigachat_auth_client = gigachat_clients.GigachatAuthClient(
+            provider=aiohttp_client,
+            token=settings.GIGACHAT_API_KEY,
+        )
+        gigachat_art_client = gigachat_clients.GigachatArtClient(
+            provider=aiohttp_client,
+            auth_client=gigachat_auth_client,
+        )
+
         logger.info("Initializing chat_models")
         openai_llm = langchain_openai.OpenAI(temperature=0.9, openai_api_key=settings.OPENAI_API_KEY)
 
         logger.info("Initializing services")
         dalle_service = dalle_services.DalleServece(dalle_llm=openai_llm)
         chatgpt_service = chatgpt_services.ChatGPTServece(chatgpt_llm=openai_llm)
+        gigachat_service = gigachat_services.GigachatArtService(gigachat_client=gigachat_art_client)
 
         logger.info("Initializing handlers")
         liveness_probe_handler = health_api.LivenessProbeHandler()
@@ -48,6 +68,7 @@ class Application:
         promt_detail_handler = health_api.PromtDetailHandler()
         dalle_create_handler = dalle_api.DalleCreateHandler(dalle_service=dalle_service)
         chatgpt_create_handler = chatgpt_api.ChatGPT4CreateHandler(chatgpt_service=chatgpt_service)
+        gigachat_art_create_handler = gigachat_api.GigachatArtCreateHandler(gigachat_service=gigachat_service)
 
         logger.info("Creating fastapi application")
         fastapi_app = fastapi.FastAPI()
@@ -62,10 +83,14 @@ class Application:
         fastapi_app.post("/api/v1/openai/chat", tags=["OpenAI"])(chatgpt_create_handler.process)
         fastapi_app.post("/api/v1/openai/dalle", tags=["OpenAI"])(dalle_create_handler.process)
 
+        # Gigachat
+        fastapi_app.post("/api/v1/gigachat/art", tags=["Gigachat"])(gigachat_art_create_handler.process)
+
         logger.info("Creating application")
         application = Application(
             settings=settings,
             fastapi_app=fastapi_app,
+            aiohttp_client=aiohttp_client,
         )
 
         logger.info("Initializing application finished")
@@ -99,6 +124,15 @@ class Application:
         logger.info("Application is shutting down...")
 
         dispose_errors: list = []
+
+        logger.info("Disposing Aiohttp client")
+        try:
+            await self._aiohttp_client.close()
+        except Exception as unexpected_error:
+            dispose_errors.append(unexpected_error)
+            logger.exception("Failed to dispose Aiohttp client")
+        else:
+            logger.info("Aiohttp client has been disposed")
 
         if len(dispose_errors) != 0:
             logger.error("Application has shut down with errors")
