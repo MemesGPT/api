@@ -1,6 +1,5 @@
-from .gigachat_art import GigachatArtImgScheme, GigachatArtPromtScheme
+from .gigachat_art import GigachatArtPromtScheme
 
 __all__ = [
     "GigachatArtPromtScheme",
-    "GigachatArtImgScheme",
 ]

@@ -3,6 +3,10 @@ import typing
 
 
 def get_image_id_from_response(response: typing.Mapping[str, typing.Any]) -> str | None:
+    """Временная утилса.
+
+    Пока GigachatArtClient не использует пидантик-схемы для полученных данных.
+    """
     def find_uuid4(text: str) -> str | None:
         pattern = r'"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"'
         match = re.search(pattern, text)

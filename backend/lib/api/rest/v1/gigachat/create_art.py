@@ -18,7 +18,7 @@ class GigachatArtCreateHandler(GigachatArtCreateHandlerProtocol):
     def __init__(self, gigachat_service: gigachat_services.GigachatArtServiceProtocol) -> None:
         self._gigachat_service = gigachat_service
 
-    async def process(self, promt_in: gigachat_schemes.GigachatArtPromtScheme) -> gigachat_schemes.GigachatArtImgScheme:
+    async def process(self, promt_in: gigachat_schemes.GigachatArtPromtScheme) -> fastapi.Response:
         image_bytes = await self._gigachat_service.create(promt_str=promt_in.text)
         return fastapi.Response(content=image_bytes, media_type="image/jpg")
 
