@@ -12,6 +12,11 @@ class HTTPEndpoint:
     method: str
 
 
+class OpenAISettings(pydantic.BaseSettings):
+    OPENAI_API_KEY: pydantic.SecretStr
+    DEF_TEMPERATURE: float = 0.9
+
+
 class Settings(pydantic.BaseSettings):
     # App
     APP_ENV: str = "development"
@@ -26,8 +31,10 @@ class Settings(pydantic.BaseSettings):
     SERVER_HOST: str
     SERVER_PORT: int
 
-    # openai
-    OPENAI_API_KEY: str
+    # OpenAI
+    openai: OpenAISettings = OpenAISettings()
+
+    # GigaChat
     GIGACHAT_API_KEY: str
 
     @property

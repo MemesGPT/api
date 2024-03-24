@@ -17,6 +17,9 @@ lint:
 	@echo 'Running ruff checks...'
 	@$(PYTHON) -m ruff check
 
+	@echo 'Running mypy checks...'
+	@$(PYTHON) -m mypy .
+
 .PHONY: dev-server-start
 dev-server-start:
 	@echo 'Starting dev server...'

@@ -55,7 +55,10 @@ class Application:
         )
 
         logger.info("Initializing chat_models")
-        openai_llm = langchain_openai.OpenAI(temperature=0.9, openai_api_key=settings.OPENAI_API_KEY)  # type: ignore
+        openai_llm = langchain_openai.OpenAI(
+            temperature=settings.openai.DEF_TEMPERATURE,
+            openai_api_key=settings.openai.OPENAI_API_KEY,
+        )
 
         logger.info("Initializing services")
         dalle_service = dalle_services.DalleServece(dalle_llm=openai_llm)

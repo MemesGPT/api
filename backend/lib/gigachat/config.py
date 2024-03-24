@@ -2,6 +2,11 @@ import pydantic
 
 
 class GigachatConfig(pydantic.BaseSettings):
+    """Конфиги для Гигачата.
+
+    TODO: возможно лучше будут смотреться в настройках приложения
+    """
+
     auth_url: str = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
     chat_completions_url: str = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
     fetch_img_by_id_url: str = "https://gigachat.devices.sberbank.ru/api/v1/files/{}/content"
