@@ -6,6 +6,10 @@ def get_image_id_from_response(response: typing.Mapping[str, typing.Any]) -> str
     """Временная утилса.
 
     Пока GigachatArtClient не использует пидантик-схемы для полученных данных.
+    Таска в техдолге.
+
+    TODO(AlexPunches): типизировать получаемые данные, например Пидантик схему для "Скачивание изображения"
+        #22 https://github.com/MemesGPT/api/issues/22
     """
     def find_uuid4(text: str) -> str | None:
         pattern = r'"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"'

@@ -45,3 +45,9 @@ jobs:
           cd backend
           source .venv/bin/activate
           python -m ruff check ./
+
+      - name: Run mypy
+        run: |
+          cd backend
+          source .venv/bin/activate
+          python -m mypy ./
