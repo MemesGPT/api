@@ -18,9 +18,7 @@ class DalleCreateHandler(DalleCreateHandlerProtocol):
 
     async def process(self, promt_in: dalle_schemes.DallePromtScheme) -> dalle_schemes.ImageScheme:
         image_url = await self._dalle_service.create(promt_in.text)
-        return dalle_schemes.ImageScheme(
-            image_url=image_url,
-        )
+        return dalle_schemes.ImageScheme(image_url=image_url)
 
 
 __all__ = [

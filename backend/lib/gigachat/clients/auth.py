@@ -3,8 +3,8 @@ import uuid
 
 import aiohttp
 
-import lib.gigachat.clients.schemes as clients_schemes
 import lib.gigachat.config as gigachat_configs
+import lib.gigachat.schemes as gigachat_schemes
 
 gigachat_config = gigachat_configs.GigachatConfig()
 
@@ -22,7 +22,7 @@ class GigachatAuthClient(GigachatAuthClientProtocol):
     async def fetch_token(self) -> str:
         url = gigachat_config.auth_url
         payload = "scope=GIGACHAT_API_PERS"
-        headers = clients_schemes.HeaderFetchTokenScheme(
+        headers = gigachat_schemes.HeaderFetchTokenScheme(
             rquid=uuid.uuid4(),
             authorization=f"Basic {self._token}",
         ).dict(by_alias=True)
