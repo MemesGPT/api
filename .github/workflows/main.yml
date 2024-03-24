@@ -4,6 +4,8 @@ on:
   push:
     branches: [ developer, main ]
 
+  workflow_dispatch:
+
 env:
     CR_REGISTRY: "${{ secrets.CR_REGISTRY }}"
     CR_REPO: "${{ secrets.CR_REPO }}"
