@@ -15,9 +15,7 @@ class ChatGPTServece(ChatGPTServeceProtocol):
         self._chatgpt_llm = chatgpt_llm
 
     async def create(self, promt_str: str) -> str:
-        template = """Вопрос: {question}
-
-        Ответ: Давайте подумаем шаг за шагом."""
+        template = """{question}"""
 
         prompt = PromptTemplate.from_template(template)
         llm_chain = LLMChain(prompt=prompt, llm=self._chatgpt_llm)
