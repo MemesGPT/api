@@ -4,8 +4,8 @@ import typing
 import aiohttp
 
 import lib.gigachat.clients.auth as gigachat_auth
-import lib.gigachat.clients.schemes as clients_schemes
 import lib.gigachat.config as gigachat_configs
+import lib.gigachat.schemes as gigachat_schemes
 import lib.gigachat.utils as gigachat_utils
 
 logger = logging.getLogger(__name__)
@@ -37,9 +37,9 @@ class GigachatArtClient(GigachatArtClientProtocol):
     async def _fetch_image_id_by_promt(self, promt_str: str, token: str) -> str:
         promt_str = gigachat_config.start_art_promt_template.format(promt_str)
         url = gigachat_config.chat_completions_url
-        headers = clients_schemes.HeaderFetchImageIdScheme(authorization=f"Bearer {token}").dict(by_alias=True)
-        user_message = clients_schemes.UserMessageScheme(content=promt_str)
-        art_message = clients_schemes.ArtMessageScheme(messages=[user_message]).dict()
+        headers = gigachat_schemes.HeaderFetchImageIdScheme(authorization=f"Bearer {token}").dict(by_alias=True)
+        user_message = gigachat_schemes.UserMessageScheme(content=promt_str)
+        art_message = gigachat_schemes.ArtMessageScheme(messages=[user_message]).dict()
 
         async with self._provider.post(url=url, headers=headers, json=art_message, ssl=False) as response:
             result = await response.json()
@@ -49,7 +49,7 @@ class GigachatArtClient(GigachatArtClientProtocol):
 
     async def _fetch_image_bytes_by_id(self, image_id: str, token: str) -> bytes:
         url = gigachat_config.fetch_img_by_id_url.format(image_id)
-        headers = clients_schemes.HeaderFetchImageScheme(authorization=f"Bearer {token}").dict(by_alias=True)
+        headers = gigachat_schemes.HeaderFetchImageScheme(authorization=f"Bearer {token}").dict(by_alias=True)
 
         async with self._provider.get(url=url, headers=headers, ssl=False) as response:
             return await response.read()

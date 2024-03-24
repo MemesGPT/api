@@ -1,7 +1,9 @@
 import logging
 import typing
 
-from openai import OpenAI
+import openai
+
+import lib.dalle.schemes as dalle_schemes
 
 logger = logging.getLogger(__name__)
 
@@ -12,17 +14,11 @@ class DalleServiceProtocol(typing.Protocol):
 
 
 class DalleServece(DalleServiceProtocol):
-    def __init__(self, dalle_client: OpenAI) -> None:
+    def __init__(self, dalle_client: openai.OpenAI) -> None:
         self._dalle_client = dalle_client
 
     async def create(self, promt_str: str) -> str | None:
-        response = self._dalle_client.images.generate(
-            model="dall-e-3",
-            prompt=promt_str,
-            size="1024x1024",
-            quality="standard",
-            n=1,
-        )
+        response = self._dalle_client.images.generate(**dalle_schemes.ImagesGenerateScheme(prompt=promt_str).dict())
         return response.data[0].url
 
 

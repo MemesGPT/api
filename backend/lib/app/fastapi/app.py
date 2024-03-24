@@ -5,8 +5,8 @@ import logging
 import aiohttp
 import fastapi
 import langchain.chat_models as langchain_chat_models
+import openai
 import uvicorn
-from openai import OpenAI
 
 import lib.api.rest.v1.chatgpt4 as chatgpt_api
 import lib.api.rest.v1.dalle as dalle_api
@@ -54,7 +54,7 @@ class Application:
             provider=aiohttp_client,
             auth_client=gigachat_auth_client,
         )
-        dalle_client = OpenAI(api_key=settings.openai.OPENAI_API_KEY.get_secret_value())
+        dalle_client = openai.OpenAI(api_key=settings.openai.OPENAI_API_KEY.get_secret_value())
 
         logger.info("Initializing chat_models")
         openai_gpt4 = langchain_chat_models.ChatOpenAI(  # type: ignore
