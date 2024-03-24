@@ -44,8 +44,12 @@ class HeaderFetchImageScheme(pydantic.BaseModel):
 class HeaderFetchTokenScheme(pydantic.BaseModel):
     content_type: str = pydantic.Field(default="application/x-www-form-urlencoded", alias="Content-Type")
     accept: str = pydantic.Field(default="application/json", alias="Accept")
-    rquid: uuid.UUID = pydantic.Field(default=uuid.uuid4(), alias="RqUID")
+    rquid: uuid.UUID = pydantic.Field(..., alias="RqUID")
     authorization: str = pydantic.Field(..., alias="Authorization")
+
+    _transform_uuids = pydantic.validator("rquid", allow_reuse=True)(
+        lambda x: str(x) if x else x,
+    )
 
     class Config:
         allow_population_by_field_name = True

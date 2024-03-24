@@ -1,4 +1,5 @@
 import typing
+import uuid
 
 import aiohttp
 
@@ -21,7 +22,10 @@ class GigachatAuthClient(GigachatAuthClientProtocol):
     async def fetch_token(self) -> str:
         url = gigachat_config.auth_url
         payload = "scope=GIGACHAT_API_PERS"
-        headers = clients_schemes.HeaderFetchTokenScheme(authorization=f"Basic {self._token}").dict(by_alias=True)
+        headers = clients_schemes.HeaderFetchTokenScheme(
+            rquid=uuid.uuid4(),
+            authorization=f"Basic {self._token}",
+        ).dict(by_alias=True)
         async with self._provider.post(url=url, data=payload, headers=headers, ssl=False) as response:
             result = await response.json()
             return result.get("access_token")
