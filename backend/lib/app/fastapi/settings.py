@@ -15,6 +15,7 @@ class HTTPEndpoint:
 class OpenAISettings(pydantic.BaseSettings):
     OPENAI_API_KEY: pydantic.SecretStr
     DEF_TEMPERATURE: float = 0.9
+    DEF_GPT_4_MODEL: str = "gpt-4"
 
 
 class Settings(pydantic.BaseSettings):

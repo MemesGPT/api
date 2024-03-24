@@ -4,6 +4,7 @@ import logging
 
 import aiohttp
 import fastapi
+import langchain.chat_models as langchain_chat_models
 import langchain_openai
 import uvicorn
 
@@ -59,10 +60,14 @@ class Application:
             temperature=settings.openai.DEF_TEMPERATURE,
             openai_api_key=settings.openai.OPENAI_API_KEY,
         )
+        openai_gpt4 = langchain_chat_models.ChatOpenAI(  # type: ignore
+            model=settings.openai.DEF_GPT_4_MODEL,
+            openai_api_key=settings.openai.OPENAI_API_KEY.get_secret_value(),
+        )
 
         logger.info("Initializing services")
         dalle_service = dalle_services.DalleServece(dalle_llm=openai_llm)
-        chatgpt_service = chatgpt_services.ChatGPTServece(chatgpt_llm=openai_llm)
+        chatgpt_service = chatgpt_services.ChatGPTServece(chatgpt_llm=openai_gpt4)
         gigachat_service = gigachat_services.GigachatArtService(gigachat_client=gigachat_art_client)
 
         logger.info("Initializing handlers")
@@ -83,7 +88,7 @@ class Application:
         fastapi_app.get("/api/v1/promt/{promt_id}", tags=["ping"])(promt_detail_handler.process)
 
         # OpenAI
-        fastapi_app.post("/api/v1/openai/chat", tags=["OpenAI"])(chatgpt_create_handler.process)
+        fastapi_app.post("/api/v1/openai/chat", tags=["OpenAI"], name="gpt-4")(chatgpt_create_handler.process)
         fastapi_app.post("/api/v1/openai/dalle", tags=["OpenAI"])(dalle_create_handler.process)
 
         # Gigachat
