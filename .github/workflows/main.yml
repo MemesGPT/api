@@ -2,7 +2,7 @@ name: memes_gpt_CD
 
 on:
   push:
-    branches: [ develop, main ]
+    branches: [ developer, main ]
 
 env:
     CR_REGISTRY: "${{ secrets.CR_REGISTRY }}"
@@ -20,7 +20,7 @@ jobs:
 
       - name: Login to Yandex Cloud Container Registry
         id: login-cr
-        uses: yc-actions/yc-cr-login@v0.1-alpha
+        uses: yc-actions/yc-cr-login@v2
         with:
           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
 
