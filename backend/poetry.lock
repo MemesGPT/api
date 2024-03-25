@@ -1535,6 +1535,21 @@ docs = ["sphinx (>=5.3)", "sphinx-rtd-theme (>=1.0)"]
 testing = ["coverage (>=6.2)", "hypothesis (>=5.7.1)"]
 
 [[package]]
+name = "pytest-ruff"
+version = "0.3.1"
+description = "pytest plugin to check ruff requirements."
+optional = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "pytest_ruff-0.3.1-py3-none-any.whl", hash = "sha256:008556576fb1bda93a432ad381432bfd5575cc94627d22bfdece46561b8e4f7f"},
+    {file = "pytest_ruff-0.3.1.tar.gz", hash = "sha256:c9f7392a3384af73a6a72741a4035a605480a7a8e7a4bd8da05a98e6664cffb5"},
+]
+
+[package.dependencies]
+pytest = ">=5"
+ruff = ">=0.0.242"
+
+[[package]]
 name = "python-dateutil"
 version = "2.9.0.post0"
 description = "Extensions to the standard Python datetime module"
@@ -2335,4 +2350,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "b743c1a30dad2d3a8dbf7aa01df9d30f3f2abe763d681ecb46218f4b59557d2f"
+content-hash = "6b3e1ea64cdef51931e39a6f5563d5ebf22f19420411230eab47c205870f40a6"

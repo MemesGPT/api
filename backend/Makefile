@@ -32,4 +32,9 @@ dev-server-start:
 .PHONY: test
 test:
 	@echo 'Starting dev server...'
-	@$(PYTHON) -m pytest tests
+	@SERVER_HOST=$(SERVER_HOST) \
+		SERVER_PORT=$(SERVER_PORT) \
+		OPENAI_API_KEY=$(OPENAI_API_KEY) \
+		GIGACHAT_API_KEY=$(GIGACHAT_API_KEY) \
+		$(PYTHON) -m pytest tests -W ignore::DeprecationWarning
+
