@@ -5,6 +5,11 @@ on: [pull_request]
 jobs:
   linters:
     runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ${secrets.OPENAI_API_KEY}
+      GIGACHAT_API_KEY: ${secrets.GIGACHAT_API_KEY}
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 8080
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -51,3 +56,9 @@ jobs:
           cd backend
           source .venv/bin/activate
           python -m mypy ./
+
+      - name: Run pytest
+        run: |
+          cd backend
+          source .venv/bin/activate
+          python -m pytest tests -W ignore::DeprecationWarning
