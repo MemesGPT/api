@@ -1,5 +1,6 @@
-# api
 
+# MemesGPT API
+[![CI](https://github.com/MemesGPT/api/actions/workflows/tests.yml/badge.svg?branch=developer)](https://github.com/MemesGPT/api/actions/workflows/tests.yml)
 ### Запустить Dev локально
 
 ```bash
@@ -15,6 +16,7 @@ make dev-server-start
 
 свагер будет примерно тут:  
 http://localhost:8081/docs
+
 ---
 
 ### Запуск приложения на докерах локально
