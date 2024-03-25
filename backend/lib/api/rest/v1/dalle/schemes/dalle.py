@@ -9,7 +9,7 @@ class DallePromtScheme(pydantic.BaseModel):
 
 class ImageScheme(pydantic.BaseModel):
     id: uuid.UUID = pydantic.Field(default=uuid.uuid4())
-    image_url: str
+    image_url: str | None
 
 
 __all__ = [

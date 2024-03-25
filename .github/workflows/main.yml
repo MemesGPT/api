@@ -1,4 +1,4 @@
-name: memes_gpt_CD
+name: CD
 
 on:
   push:
