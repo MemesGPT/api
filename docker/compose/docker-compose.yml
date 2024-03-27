@@ -3,9 +3,36 @@ version: "3"
 services:
   memes_api:
     build: ../../backend
+    depends_on:
+      postgres_master:
+        condition: service_started
     expose:
       - "${SERVER_PORT}"
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     env_file:
       - ./.env
+
+  postgres_master:
+    build: ../postgres/master
+    hostname: memesgpt_postgres_master
+    container_name: memesgpt_postgres_master
+    volumes:
+      - postgres_master_data:/var/lib/postgresql/data
+    ports:
+      - "50432:50432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_TEST_DB: ${POSTGRES_TEST_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    env_file:
+      - ./.env
+    command: [
+        "postgres",
+        "-c", "config_file=/etc/postgresql/postgresql.conf"
+    ]
+
+volumes:
+  postgres_master_data:
+    driver: local
