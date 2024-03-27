@@ -5,7 +5,7 @@ title: DB API
 erDiagram
     Results {
         UUID id
-        string text
-        string image_url
+        string total_text
+        string image_id
     }
 ```
