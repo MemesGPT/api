@@ -1,9 +1,6 @@
 name: CD
 
 on:
-  push:
-    branches: [ developer, main ]
-
   workflow_dispatch:
 
 env:

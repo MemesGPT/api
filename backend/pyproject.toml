@@ -39,7 +39,6 @@ exclude = [
     ".idea",
     ".git",
     ".venv",
-#    "tests",
 ]
 fix = true
 unsafe-fixes = false
@@ -47,7 +46,7 @@ line-length = 120
 lint.select = ["ALL"]
 lint.ignore = [
     "D1", "D203", "D213", "FA102", "ANN101", "RUF001", "RUF002", "RUF003", "FIX002", "A003", "E712", "PGH003", "ARG002",
-    "ANN102"
+    "ANN102", "S101"
 ]
 
 [tool.ruff.format]
