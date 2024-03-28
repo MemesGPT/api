@@ -6,18 +6,25 @@ import aiohttp
 import fastapi
 import langchain.chat_models as langchain_chat_models
 import openai
+import sqlalchemy
+import sqlalchemy.ext.asyncio as sqlalchemy_asyncio
+import sqlalchemy.orm as sqlalchemy_orm
 import uvicorn
 
 import lib.api.rest.v1.chatgpt4 as chatgpt_api
 import lib.api.rest.v1.dalle as dalle_api
 import lib.api.rest.v1.gigachat as gigachat_api
 import lib.api.rest.v1.health as health_api
+import lib.api.rest.v1.joke as joke_api
 import lib.app.fastapi.errors as app_errors
 import lib.app.fastapi.settings as app_settings
 import lib.chatgpt.services as chatgpt_services
 import lib.dalle.serveces as dalle_services
 import lib.gigachat.clients as gigachat_clients
 import lib.gigachat.services as gigachat_services
+import lib.joke.repositories as joke_repositories
+import lib.joke.sevices as joke_services
+import lib.utils.sqlalchemy as sqlalchemy_utils
 
 logger = logging.getLogger(__name__)
 
@@ -28,10 +35,12 @@ class Application:
         settings: app_settings.Settings,
         fastapi_app: fastapi.FastAPI,
         aiohttp_client: aiohttp.ClientSession,
+        sqlalchemy_engine: sqlalchemy_utils.AsyncEngine,
     ) -> None:
         self._settings = settings
         self._fastapi_app = fastapi_app
         self._aiohttp_client = aiohttp_client
+        self._sqlalchemy_engine = sqlalchemy_engine
 
     @classmethod
     def from_settings(cls, settings: app_settings.Settings) -> Application:
@@ -41,6 +50,25 @@ class Application:
         )
 
         logger.info("Initializing application")
+
+        logger.info("Creating sqlalchemy engine")
+        sqlalchemy_url = sqlalchemy.engine.URL.create(
+            drivername="postgresql+asyncpg",
+            username=settings.POSTGRES_USER,
+            password=settings.POSTGRES_PASSWORD,
+            host=settings.PG_MASTER_HOST,
+            port=settings.PG_MASTER_PORT,
+            database=settings.POSTGRES_DB,
+        )
+        sqlalchemy_engine = sqlalchemy_asyncio.create_async_engine(
+            url=sqlalchemy_url,
+            echo=settings.is_development,
+            pool_size=settings.PG_CONNECTION_POOL_SIZE,
+        )
+        sqlalchemy_session_maker: sqlalchemy_utils.AsyncSessionMaker = sqlalchemy_orm.sessionmaker(  # type: ignore
+            bind=sqlalchemy_engine,
+            class_=sqlalchemy_utils.AsyncSession,
+        )
 
         logger.info("Initializing global clients")
         aiohttp_client = aiohttp.ClientSession()
@@ -62,10 +90,19 @@ class Application:
             openai_api_key=settings.openai.OPENAI_API_KEY.get_secret_value(),
         )
 
+        logger.info("Initializing repositories")
+        joke_repository = joke_repositories.JokePostgresRepository()
+
         logger.info("Initializing services")
         dalle_service = dalle_services.DalleServece(dalle_client=dalle_client)
-        chatgpt_service = chatgpt_services.ChatGPTServece(chatgpt_llm=openai_gpt4)
+        chatgpt_service = chatgpt_services.ChatGPTServece(
+            chatgpt_llm=openai_gpt4,
+        )
         gigachat_service = gigachat_services.GigachatArtService(gigachat_client=gigachat_art_client)
+        joke_service = joke_services.JokeService(
+            joke_repository=joke_repository,
+            session_maker=sqlalchemy_session_maker,
+        )
 
         logger.info("Initializing handlers")
         liveness_probe_handler = health_api.LivenessProbeHandler()
@@ -74,6 +111,7 @@ class Application:
         dalle_create_handler = dalle_api.DalleCreateHandler(dalle_service=dalle_service)
         chatgpt_create_handler = chatgpt_api.ChatGPT4CreateHandler(chatgpt_service=chatgpt_service)
         gigachat_art_create_handler = gigachat_api.GigachatArtCreateHandler(gigachat_service=gigachat_service)
+        joke_list_handler = joke_api.JokeListHandler(joke_service=joke_service)
 
         logger.info("Creating fastapi application")
         fastapi_app = fastapi.FastAPI()
@@ -91,11 +129,15 @@ class Application:
         # Gigachat
         fastapi_app.post("/api/v1/gigachat/art", tags=["Gigachat"])(gigachat_art_create_handler.process)
 
+        # Jokes
+        fastapi_app.get("/api/v1/jokes", tags=["Jokes"])(joke_list_handler.process)
+
         logger.info("Creating application")
         application = Application(
             settings=settings,
             fastapi_app=fastapi_app,
             aiohttp_client=aiohttp_client,
+            sqlalchemy_engine=sqlalchemy_engine,
         )
 
         logger.info("Initializing application finished")
@@ -129,6 +171,15 @@ class Application:
         logger.info("Application is shutting down...")
 
         dispose_errors: list = []
+
+        logger.info("Disposing SQLAlchemy client")
+        try:
+            await self._sqlalchemy_engine.dispose()
+        except Exception as unexpected_error:
+            dispose_errors.append(unexpected_error)
+            logger.exception("Failed to dispose SQLAlchemy client")
+        else:
+            logger.info("SQLAlchemy client has been disposed")
 
         logger.info("Disposing Aiohttp client")
         try:
