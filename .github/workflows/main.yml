@@ -6,6 +6,7 @@ on:
 env:
     CR_REGISTRY: "${{ secrets.CR_REGISTRY }}"
     CR_REPO: "${{ secrets.CR_REPO }}"
+    CR_REPO_DB: "${{ secrets.CR_REPO_DB }}"
     IMAGE_TAG: "${{ github.sha }}"
     YC_PATH: "/home/${{ secrets.MEMES_HOST_USER }}/yandex-cloud/bin"
     NETWORK: "memes_gpt_net"
@@ -27,10 +28,17 @@ jobs:
         run: |
           echo "SHORT_SHA=`echo ${IMAGE_TAG} | cut -c1-8`" >> $GITHUB_ENV
 
-      - name: Build, tag, and push image to Yandex Cloud Container Registry
+      - name: Build, tag, and push API image to Yandex Cloud Container Registry
+        if: ${{ success() }}
         run: |
           docker build -t cr.yandex/$CR_REGISTRY/$CR_REPO:${SHORT_SHA} ./backend
           docker push cr.yandex/$CR_REGISTRY/$CR_REPO:${SHORT_SHA}
+
+      - name: Build, tag, and push DB image to Yandex Cloud Container Registry
+        if: ${{ success() }}
+        run: |
+          docker build -t cr.yandex/$CR_REGISTRY/$CR_REPO_DB:${SHORT_SHA} ./docker/postgres/master
+          docker push cr.yandex/$CR_REGISTRY/$CR_REPO_DB:${SHORT_SHA}
 
   deploy:
     runs-on: ubuntu-latest
@@ -41,6 +49,29 @@ jobs:
           echo "SHORT_SHA=`echo ${IMAGE_TAG} | cut -c1-8`" >> $GITHUB_ENV
 
       - name: executing remote ssh commands to deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.MEMES_HOST }}
+          username: ${{ secrets.MEMES_HOST_USER }}
+          key: ${{ secrets.MEMES_SSH_KEY }}
+          script_stop: true
+          envs: CR_REGISTRY, CR_REPO_DB, SHORT_SHA, YC_PATH, NETWORK
+          script: |
+            export PATH=$PATH:$YC_PATH
+            docker pull cr.yandex/$CR_REGISTRY/$CR_REPO_DB:$SHORT_SHA
+            docker stop $CR_REPO_DB || true
+            docker rm $CR_REPO_DB || true
+            docker images -a | grep $CR_REPO_DB | grep -v $SHORT_SHA | awk '{print $3}' | xargs docker rmi || true
+            docker run --detach --network $NETWORK --restart always \
+              --env POSTGRES_DB='${{ secrets.POSTGRES_DB }}' \
+              --env POSTGRES_USER='${{ secrets.POSTGRES_USER }}' \
+              --env POSTGRES_PASSWORD='${{ secrets.POSTGRES_PASSWORD }}' \
+              -p 50432:50432 \
+              --name $CR_REPO_DB \
+              cr.yandex/$CR_REGISTRY/$CR_REPO_DB:$SHORT_SHA
+
+      - name: executing remote ssh commands to deploy
+        if: ${{ success() }}
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.MEMES_HOST }}
