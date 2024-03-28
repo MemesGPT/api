@@ -38,6 +38,15 @@ class Settings(pydantic.BaseSettings):
     # GigaChat
     GIGACHAT_API_KEY: str
 
+    # PostgreSQL
+
+    PG_MASTER_HOST: str = "127.0.0.1"
+    PG_MASTER_PORT: int = 50432
+    POSTGRES_DB: str
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    PG_CONNECTION_POOL_SIZE: int = 100
+
     @property
     def is_development(self) -> bool:
         return self.APP_ENV == "development"

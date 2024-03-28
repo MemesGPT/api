@@ -21,6 +21,7 @@ scikit-image = "^0.22.0"
 langchain-core = "^0.1.32"
 langchain-community = "^0.0.28"
 langchain-openai = "^0.0.8"
+sqlalchemy = "^2.0.29"
 
 
 [tool.poetry.group.dev.dependencies]
