@@ -1,4 +1,5 @@
 import asyncio
+import os
 import typing
 
 import fastapi.testclient as fastapi_pytest_plugin
@@ -19,7 +20,9 @@ def fixture_loop(event_loop: asyncio.AbstractEventLoop) -> asyncio.AbstractEvent
 
 @pytest.fixture(scope="session", name="settings")
 def fixture_settings() -> app_settings.Settings:
-    return app_settings.Settings()
+    return app_settings.Settings(
+        POSTGRES_DB=os.getenv("POSTGRES_TEST_DB", default=""),
+    )
 
 
 @pytest_asyncio.fixture(scope="session", name="application")

@@ -11,7 +11,10 @@ class ChatGPTServeceProtocol(typing.Protocol):
 
 
 class ChatGPTServece(ChatGPTServeceProtocol):
-    def __init__(self, chatgpt_llm: OpenAI) -> None:
+    def __init__(
+        self,
+        chatgpt_llm: OpenAI,
+    ) -> None:
         self._chatgpt_llm = chatgpt_llm
 
     async def create(self, promt_str: str) -> str:
