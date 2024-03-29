@@ -6,11 +6,11 @@ COMPOSE_DEV_FILE=compose/docker-compose.dev.yml
 
 .PHONY: dev-build
 dev-build:
-	$(COMPOSE_ENV) docker compose -f $(COMPOSE_BASE_FILE) --env-file compose/.env.dev build
+	$(COMPOSE_ENV) docker compose -f $(COMPOSE_BASE_FILE) --env-file ./compose/.env build
 
 .PHONY: dev-start
 dev-start:
-	$(COMPOSE_ENV) docker compose -f $(COMPOSE_BASE_FILE) --env-file compose/.env.dev up --detach
+	$(COMPOSE_ENV) docker compose -f $(COMPOSE_BASE_FILE) --env-file ./compose/.env up --detach
 
 .PHONY: dev-stop
 dev-stop:

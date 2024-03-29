@@ -8,7 +8,6 @@ import langchain.chat_models as langchain_chat_models
 import openai
 import sqlalchemy
 import sqlalchemy.ext.asyncio as sqlalchemy_asyncio
-import sqlalchemy.orm as sqlalchemy_orm
 import uvicorn
 
 import lib.api.rest.v1.chatgpt4 as chatgpt_api
@@ -65,7 +64,7 @@ class Application:
             echo=settings.is_development,
             pool_size=settings.PG_CONNECTION_POOL_SIZE,
         )
-        sqlalchemy_session_maker: sqlalchemy_utils.AsyncSessionMaker = sqlalchemy_orm.sessionmaker(  # type: ignore
+        sqlalchemy_session_maker: sqlalchemy_utils.AsyncSessionMaker = sqlalchemy_asyncio.async_sessionmaker(
             bind=sqlalchemy_engine,
             class_=sqlalchemy_utils.AsyncSession,
         )

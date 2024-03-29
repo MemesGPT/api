@@ -1,5 +1,4 @@
 import typing
-import uuid
 
 import lib.api.rest.v1.joke.schemes as joke_schemes
 import lib.joke.sevices as joke_services
@@ -18,11 +17,12 @@ class JokeListHandler(JokeListHandlerProtocol):
         self._joke_service = joke_service
 
     async def process(self) -> list[joke_schemes.JokeScheme]:
+        jokes = await self._joke_service.get_all()
         return [joke_schemes.JokeScheme(
-            joke_id=uuid.uuid4(),
-            text_final="111",
-            image_id="222",
-        )]
+            joke_id=joke.joke_id,
+            text_final=joke.text_final,
+            image_id=joke.image_id,
+        ) for joke in jokes]
 
 
 __all__ = [

@@ -10,6 +10,9 @@ class JokeServiceProtocol(typing.Protocol):
     class NotFoundError(Exception):
         ...
 
+    async def get_all(self) -> list[joke_models.Joke]:
+        ...
+
     async def get_by_id(
         self,
         entity_id: uuid.UUID,
@@ -32,6 +35,10 @@ class JokeService(JokeServiceProtocol):
     ) -> None:
         self._joke_repository = joke_repository
         self._session_maker = session_maker
+
+    async def get_all(self) -> list[joke_models.Joke]:
+        async with self._session_maker() as session:
+            return await self._joke_repository.get_all(session)
 
     async def get_by_id(
         self,

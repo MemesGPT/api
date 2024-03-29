@@ -13,6 +13,9 @@ class JokePostgresRepositoryProtocol(typing.Protocol):
     class NotFoundError(Exception):
         ...
 
+    async def get_all(self, session: sqlalchemy_utils.AsyncSession) -> list[joke_models.Joke]:
+        ...
+
     async def get_by_id(
         self,
         session: sqlalchemy_utils.AsyncSession,
@@ -30,6 +33,12 @@ class JokePostgresRepositoryProtocol(typing.Protocol):
 
 
 class JokePostgresRepository(JokePostgresRepositoryProtocol):
+    async def get_all(self, session: sqlalchemy_utils.AsyncSession) -> list[joke_models.Joke]:
+        query = sqlalchemy.select(repository_models.Joke)
+        result: sqlalchemy.engine.Result = await session.execute(query)
+        jokes: typing.Sequence[repository_models.Joke] = result.scalars().all()
+        return [joke_models.Joke(**joke.as_dict()) for joke in jokes]
+
     async def get_by_id(
         self,
         session: sqlalchemy_utils.AsyncSession,
