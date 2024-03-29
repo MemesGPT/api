@@ -10,6 +10,10 @@ jobs:
       GIGACHAT_API_KEY: ${secrets.GIGACHAT_API_KEY}
       SERVER_HOST: 0.0.0.0
       SERVER_PORT: 8080
+      POSTGRES_DB: ${secrets.POSTGRES_DB}
+      POSTGRES_USER: ${secrets.POSTGRES_USER}
+      POSTGRES_PASSWORD: ${secrets.POSTGRES_PASSWORD}
+      POSTGRES_TEST_DB: ${secrets.POSTGRES_TEST_DB}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
