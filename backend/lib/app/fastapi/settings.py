@@ -39,13 +39,15 @@ class Settings(pydantic.BaseSettings):
     GIGACHAT_API_KEY: str
 
     # PostgreSQL
-
     PG_MASTER_HOST: str = "127.0.0.1"
     PG_MASTER_PORT: int = 50432
     POSTGRES_DB: str
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     PG_CONNECTION_POOL_SIZE: int = 100
+
+    # files path
+    DALLE_IMG_DIR: str = "/media/raid/memes_files"
 
     @property
     def is_development(self) -> bool:

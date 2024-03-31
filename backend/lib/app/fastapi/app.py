@@ -93,14 +93,18 @@ class Application:
         joke_repository = joke_repositories.JokePostgresRepository()
 
         logger.info("Initializing services")
-        dalle_service = dalle_services.DalleServece(dalle_client=dalle_client)
+        dalle_service = dalle_services.DalleServece(
+            dalle_client=dalle_client,
+        )
         chatgpt_service = chatgpt_services.ChatGPTServece(
             chatgpt_llm=openai_gpt4,
         )
         gigachat_service = gigachat_services.GigachatArtService(gigachat_client=gigachat_art_client)
         joke_service = joke_services.JokeService(
+            provider=aiohttp_client,
             joke_repository=joke_repository,
             session_maker=sqlalchemy_session_maker,
+            dalle_service=dalle_service,
         )
 
         logger.info("Initializing handlers")
@@ -111,25 +115,60 @@ class Application:
         chatgpt_create_handler = chatgpt_api.ChatGPT4CreateHandler(chatgpt_service=chatgpt_service)
         gigachat_art_create_handler = gigachat_api.GigachatArtCreateHandler(gigachat_service=gigachat_service)
         joke_list_handler = joke_api.JokeListHandler(joke_service=joke_service)
+        joke_create_handler = joke_api.CreateJokeHandler(joke_service=joke_service)
+        image_create_handler = joke_api.CreateImageHandler(joke_service=joke_service)
 
         logger.info("Creating fastapi application")
         fastapi_app = fastapi.FastAPI()
 
         logger.info("Initializing routes")
         # ping
-        fastapi_app.get("/api/v1/health/liveness", tags=["ping"])(liveness_probe_handler.process)
-        fastapi_app.post("/api/v1/promt", tags=["ping"])(promt_create_handler.process)
-        fastapi_app.get("/api/v1/promt/{promt_id}", tags=["ping"])(promt_detail_handler.process)
+        fastapi_app.get(
+            path="/api/v1/health/liveness",
+            tags=["dev"],
+        )(liveness_probe_handler.process)
+        fastapi_app.post(
+            path="/api/v1/promt",
+            include_in_schema=False,
+            tags=["ping"],
+        )(promt_create_handler.process)
+        fastapi_app.get(
+            path="/api/v1/promt/{promt_id}",
+            tags=["ping"],
+            include_in_schema=False,
+        )(promt_detail_handler.process)
 
         # OpenAI
-        fastapi_app.post("/api/v1/openai/chat", tags=["OpenAI"], name="gpt-4")(chatgpt_create_handler.process)
-        fastapi_app.post("/api/v1/openai/dalle", tags=["OpenAI"])(dalle_create_handler.process)
+        fastapi_app.post(
+            path="/api/v1/openai/chat",
+            tags=["dev"],
+            name="gpt-4",
+        )(chatgpt_create_handler.process)
+        fastapi_app.post(
+            path="/api/v1/openai/dalle",
+            tags=["dev"],
+        )(dalle_create_handler.process)
 
         # Gigachat
-        fastapi_app.post("/api/v1/gigachat/art", tags=["Gigachat"])(gigachat_art_create_handler.process)
+        fastapi_app.post(
+            path="/api/v1/gigachat/art",
+            tags=["Gigachat"],
+            include_in_schema=False,
+        )(gigachat_art_create_handler.process)
 
         # Jokes
-        fastapi_app.get("/api/v1/jokes", tags=["Jokes"])(joke_list_handler.process)
+        fastapi_app.get(
+            path="/api/v1/fire_memes/mem",
+            tags=["Jokes"],
+        )(joke_list_handler.process)
+        fastapi_app.post(
+            path="/api/v1/fire_memes/mem/joke",
+            tags=["Jokes"],
+        )(joke_create_handler.process)
+        fastapi_app.post(
+            path="/api/v1/fire_memes/mem/{mem_id}/image",
+            tags=["Jokes"],
+        )(image_create_handler.process)
 
         logger.info("Creating application")
         application = Application(

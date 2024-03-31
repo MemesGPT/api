@@ -4,16 +4,16 @@ import pydantic
 
 
 class JokeCreateScheme(pydantic.BaseModel):
-    text: str
+    text_final: str = pydantic.Field(..., alias="text")
 
 
 class JokeWithoutIdScheme(JokeCreateScheme):
-    text_final: str
-    image_id: str
+    text_final: str = pydantic.Field(..., alias="text")
+    image_id: str = pydantic.Field(..., alias="image")
 
 
 class JokeScheme(JokeWithoutIdScheme):
-    joke_id: uuid.UUID
+    joke_id: uuid.UUID = pydantic.Field(..., alias="id")
 
 
 __all__ = [

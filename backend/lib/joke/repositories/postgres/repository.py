@@ -27,7 +27,7 @@ class JokePostgresRepositoryProtocol(typing.Protocol):
     async def create(
         self,
         session: sqlalchemy_utils.AsyncSession,
-        user: joke_models.JokeWithoutID,
+        joke: joke_models.JokeWithoutID,
     ) -> joke_models.Joke:
         ...
 

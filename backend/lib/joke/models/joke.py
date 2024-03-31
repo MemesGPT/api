@@ -3,9 +3,13 @@ import uuid
 
 
 @dataclasses.dataclass
-class JokeWithoutID:
-    image_id: str
+class JokeCreate:
     text_final: str
+
+
+@dataclasses.dataclass
+class JokeWithoutID(JokeCreate):
+    image_id: str
 
 
 @dataclasses.dataclass
@@ -16,4 +20,5 @@ class Joke(JokeWithoutID):
 __all__ = [
     "Joke",
     "JokeWithoutID",
+    "JokeCreate",
 ]

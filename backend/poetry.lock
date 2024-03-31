@@ -2263,6 +2263,17 @@ doc = ["cairosvg (>=2.5.2,<3.0.0)", "mdx-include (>=1.4.1,<2.0.0)", "mkdocs (>=1
 test = ["black (>=22.3.0,<23.0.0)", "coverage (>=6.2,<7.0)", "isort (>=5.0.6,<6.0.0)", "mypy (==0.910)", "pytest (>=4.4.0,<8.0.0)", "pytest-cov (>=2.10.0,<5.0.0)", "pytest-sugar (>=0.9.4,<0.10.0)", "pytest-xdist (>=1.32.0,<4.0.0)", "rich (>=10.11.0,<14.0.0)", "shellingham (>=1.3.0,<2.0.0)"]
 
 [[package]]
+name = "types-aiofiles"
+version = "23.2.0.20240331"
+description = "Typing stubs for aiofiles"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-aiofiles-23.2.0.20240331.tar.gz", hash = "sha256:8dd2a90cdcf16f9cfc9b07d77cd8eb989977c6bab2eba5b65e5929632ac77f53"},
+    {file = "types_aiofiles-23.2.0.20240331-py3-none-any.whl", hash = "sha256:40c18c68956aaf1af6a37f997ae26ff6af124e52e16ec4f2473d51c720f79cd7"},
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.10.0"
 description = "Backported and Experimental Type Hints for Python 3.8+"
@@ -2429,4 +2440,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "00256b3b31886c4775fa14a3b74f8d935aef75ca3f19840d2e8aca23b83edd17"
+content-hash = "658026b7bc00ce5ad07a64afdc9eb81446cda9ea4b655c6c541cda101ef3ee2e"
