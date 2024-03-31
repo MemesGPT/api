@@ -6,7 +6,7 @@ import lib.joke.sevices as joke_services
 
 
 class JokeListHandlerProtocol(typing.Protocol):
-    async def process(self) -> list[joke_schemes.JokeScheme]:
+    async def process(self) -> joke_schemes.PaginateJokesScheme:
         ...
 
 
@@ -17,9 +17,17 @@ class JokeListHandler(JokeListHandlerProtocol):
     ) -> None:
         self._joke_service = joke_service
 
-    async def process(self) -> list[joke_schemes.JokeScheme]:
+    async def process(self) -> joke_schemes.PaginateJokesScheme:
         jokes = await self._joke_service.get_all()
-        return [joke_schemes.JokeScheme.parse_obj(dataclasses.asdict(joke)) for joke in jokes]
+        return joke_schemes.PaginateJokesScheme(
+            page={
+                "total_pages": 1,
+                "total_items": 1,
+                "number": 1,
+                "size": 1,
+            },
+            results=[joke_schemes.JokeScheme.parse_obj(dataclasses.asdict(joke)) for joke in jokes],
+        )
 
 
 __all__ = [
