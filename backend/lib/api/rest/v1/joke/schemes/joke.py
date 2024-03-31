@@ -19,6 +19,10 @@ class JokeScheme(JokeWithoutIdScheme):
         allow_population_by_field_name = True
 
 
+class ListJokesScheme(pydantic.BaseModel):
+    memes: list[JokeScheme]
+
+
 __all__ = [
     "JokeScheme",
     "JokeWithoutIdScheme",
