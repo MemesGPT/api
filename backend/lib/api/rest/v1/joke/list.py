@@ -1,3 +1,4 @@
+import dataclasses
 import typing
 
 import lib.api.rest.v1.joke.schemes as joke_schemes
@@ -18,11 +19,7 @@ class JokeListHandler(JokeListHandlerProtocol):
 
     async def process(self) -> list[joke_schemes.JokeScheme]:
         jokes = await self._joke_service.get_all()
-        return [joke_schemes.JokeScheme(
-            joke_id=joke.joke_id,
-            text_final=joke.text_final,
-            image_id=joke.image_id,
-        ) for joke in jokes]
+        return [joke_schemes.JokeScheme.parse_obj(dataclasses.asdict(joke)) for joke in jokes]
 
 
 __all__ = [

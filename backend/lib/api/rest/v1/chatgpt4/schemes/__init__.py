@@ -1,9 +1,7 @@
-from .answer import AnswerScheme, AnswerWithoutId
-from .promt import PromtScheme, PromtWithoutId
+from .answer import AnswerScheme
+from .promt import PromtScheme
 
 __all__ = [
     "PromtScheme",
-    "PromtWithoutId",
     "AnswerScheme",
-    "AnswerWithoutId",
 ]

@@ -3,7 +3,11 @@ import uuid
 import pydantic
 
 
-class JokeWithoutIdScheme(pydantic.BaseModel):
+class JokeCreateScheme(pydantic.BaseModel):
+    text: str
+
+
+class JokeWithoutIdScheme(JokeCreateScheme):
     text_final: str
     image_id: str
 
@@ -15,4 +19,5 @@ class JokeScheme(JokeWithoutIdScheme):
 __all__ = [
     "JokeScheme",
     "JokeWithoutIdScheme",
+    "JokeCreateScheme",
 ]
