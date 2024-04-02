@@ -23,4 +23,7 @@ COPY --from=builder /opt/backend/bin /opt/backend/bin
 COPY --from=builder /opt/backend/lib /opt/backend/lib
 
 WORKDIR /opt/backend
-CMD [".venv/bin/python", "-m", "bin.web"]
+# TODO: Сделать миграции алимпиком
+#   https://github.com/MemesGPT/api/issues/42
+CMD .venv/bin/python -m bin.migrate \
+    && .venv/bin/python -m bin.web

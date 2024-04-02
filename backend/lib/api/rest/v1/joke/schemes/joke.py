@@ -2,8 +2,6 @@ import uuid
 
 import pydantic
 
-import lib.api.rest.v1.schemes as base_schemes
-
 
 class JokeCreateScheme(pydantic.BaseModel):
     text_final: str = pydantic.Field(..., alias="text")
@@ -22,8 +20,7 @@ class JokeScheme(JokeWithoutIdScheme):
 
 
 class PaginateJokesScheme(pydantic.BaseModel):
-    page: base_schemes.Paginator
-    results: list[JokeScheme]
+    memes: list[JokeScheme]
 
 
 __all__ = [

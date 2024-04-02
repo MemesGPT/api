@@ -49,6 +49,9 @@ class Settings(pydantic.BaseSettings):
     # files path
     DALLE_IMG_DIR: str = "/media/raid/memes_files"
 
+    DEF_PAGE_NUMBER: int = 1
+    DEF_PAGE_SIZE: int = 50
+
     @property
     def is_development(self) -> bool:
         return self.APP_ENV == "development"
