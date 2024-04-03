@@ -19,7 +19,7 @@ class CreateJokeHandler(CreateJokeHandlerProtocol):
         self._joke_service = joke_service
 
     async def process(self, prompt: joke_schemes.JokeCreateScheme) -> joke_schemes.JokeScheme:
-        joke = await self._joke_service.create(joke_models.JokeCreate(text_final=prompt.text_final))
+        joke = await self._joke_service.create_joke(joke_models.JokeCreate(prompt_text=prompt.text_final))
         return joke_schemes.JokeScheme(**dataclasses.asdict(joke))
 
 

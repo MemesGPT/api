@@ -9,7 +9,7 @@ class JokeCreateScheme(pydantic.BaseModel):
 
 class JokeWithoutIdScheme(JokeCreateScheme):
     text_final: str = pydantic.Field(..., alias="text")
-    image_id: str = pydantic.Field(..., alias="image")
+    image_id: str | None = pydantic.Field(None, alias="image")
 
 
 class JokeScheme(JokeWithoutIdScheme):

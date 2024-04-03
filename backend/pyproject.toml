@@ -68,7 +68,7 @@ known-local-folder = []
 runtime-evaluated-decorators = ["pydantic.validate_call", "attrs.define"]
 runtime-evaluated-base-classes = ["pydantic.BaseModel"]
 
-[tool.ruff.flake8-bugbear]
+[tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = ["fastapi.Depends", "fastapi.params.Depends", "fastapi.Query", "fastapi.params.Query"]
 
 [tool.mypy]

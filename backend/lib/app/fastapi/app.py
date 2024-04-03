@@ -105,6 +105,7 @@ class Application:
             joke_repository=joke_repository,
             session_maker=sqlalchemy_session_maker,
             dalle_service=dalle_service,
+            chatgpt_service=chatgpt_service,
         )
 
         logger.info("Initializing handlers")
