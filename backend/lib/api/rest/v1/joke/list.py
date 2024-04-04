@@ -1,11 +1,15 @@
+import dataclasses
 import typing
 
 import lib.api.rest.v1.joke.schemes as joke_schemes
+import lib.app.fastapi.settings as app_settings
 import lib.joke.sevices as joke_services
+
+settings = app_settings.Settings()
 
 
 class JokeListHandlerProtocol(typing.Protocol):
-    async def process(self) -> list[joke_schemes.JokeScheme]:
+    async def process(self) -> joke_schemes.PaginateJokesScheme:
         ...
 
 
@@ -16,13 +20,13 @@ class JokeListHandler(JokeListHandlerProtocol):
     ) -> None:
         self._joke_service = joke_service
 
-    async def process(self) -> list[joke_schemes.JokeScheme]:
+    async def process(
+        self,
+    ) -> joke_schemes.PaginateJokesScheme:
         jokes = await self._joke_service.get_all()
-        return [joke_schemes.JokeScheme(
-            joke_id=joke.joke_id,
-            text_final=joke.text_final,
-            image_id=joke.image_id,
-        ) for joke in jokes]
+        return joke_schemes.PaginateJokesScheme(
+            memes=[joke_schemes.JokeScheme.parse_obj(dataclasses.asdict(joke)) for joke in jokes],
+        )
 
 
 __all__ = [

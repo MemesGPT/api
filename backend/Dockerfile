@@ -22,5 +22,10 @@ COPY --from=builder /opt/backend/.venv /opt/backend/.venv
 COPY --from=builder /opt/backend/bin /opt/backend/bin
 COPY --from=builder /opt/backend/lib /opt/backend/lib
 
+RUN mkdir --parents /var/www/memes_images
+
 WORKDIR /opt/backend
-CMD [".venv/bin/python", "-m", "bin.web"]
+# TODO: Сделать миграции алимпиком
+#   https://github.com/MemesGPT/api/issues/42
+CMD .venv/bin/python -m bin.migrate \
+    && .venv/bin/python -m bin.web
