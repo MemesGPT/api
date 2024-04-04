@@ -16,7 +16,7 @@ class JokeWithoutID:
 @dataclasses.dataclass
 class Joke:
     joke_id: uuid.UUID
-    text_final: str
+    text_final: str | None = None
     image_id: str | None = None
 
 

@@ -47,7 +47,8 @@ class Settings(pydantic.BaseSettings):
     PG_CONNECTION_POOL_SIZE: int = 100
 
     # files path
-    DALLE_IMG_DIR: str = "/media/raid/memes_files"
+    DALLE_IMG_DIR: str = "/var/www/memes_images"
+    MEMES_IMG_BASE_URL: str
 
     DEF_PAGE_NUMBER: int = 1
     DEF_PAGE_SIZE: int = 50

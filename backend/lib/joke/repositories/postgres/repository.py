@@ -31,6 +31,13 @@ class JokePostgresRepositoryProtocol(typing.Protocol):
     ) -> joke_models.Joke:
         ...
 
+    async def update(
+        self,
+        session: sqlalchemy_utils.AsyncSession,
+        joke: joke_models.Joke,
+    ) -> joke_models.Joke:
+        ...
+
 
 class JokePostgresRepository(JokePostgresRepositoryProtocol):
     async def get_all(self, session: sqlalchemy_utils.AsyncSession) -> list[joke_models.Joke]:
@@ -58,11 +65,26 @@ class JokePostgresRepository(JokePostgresRepositoryProtocol):
         session: sqlalchemy_utils.AsyncSession,
         joke: joke_models.JokeWithoutID,
     ) -> joke_models.Joke:
-        db_user = repository_models.Joke(**dataclasses.asdict(joke))
-        session.add(db_user)
+        joke_db = repository_models.Joke(**dataclasses.asdict(joke))
+        session.add(joke_db)
         await session.flush()
+        return joke_models.Joke(**joke_db.as_dict())
 
-        return joke_models.Joke(**db_user.as_dict())  # pylint: disable=not-a-mapping
+    async def update(
+        self,
+        session: sqlalchemy_utils.AsyncSession,
+        joke: joke_models.Joke,
+    ) -> joke_models.Joke:
+        query = sqlalchemy.select(repository_models.Joke).where(repository_models.Joke.joke_id == joke.joke_id)
+        result: sqlalchemy.engine.Result = await session.execute(query)
+        joke_row: repository_models.Joke | None = result.scalars().one_or_none()
+
+        if joke_row is None:
+            raise self.NotFoundError
+
+        if joke.image_id is not None:
+            joke_row.image_id = joke.image_id
+        return joke_models.Joke(**joke_row.as_dict())
 
 
 __all__ = [

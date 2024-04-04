@@ -6,11 +6,14 @@ import uuid
 import aiofiles
 import aiohttp
 
+import lib.app.fastapi.settings as app_settings
 import lib.chatgpt.services as chatgpt_services
 import lib.dalle.serveces as dalle_services
 import lib.joke.models as joke_models
 import lib.joke.repositories.postgres as joke_repositories
 import lib.utils.sqlalchemy as sqlalchemy_utils
+
+settings: app_settings.Settings = app_settings.Settings()
 
 
 class JokeServiceProtocol(typing.Protocol):
@@ -18,6 +21,9 @@ class JokeServiceProtocol(typing.Protocol):
         ...
 
     class DownloadImageError(Exception):
+        ...
+
+    class GenerateImageError(Exception):
         ...
 
     async def get_all(self) -> list[joke_models.Joke]:
@@ -89,10 +95,22 @@ class JokeService(JokeServiceProtocol):
         image_prompt: str,
         joke_id: uuid.UUID,
     ) -> joke_models.Joke:
-        ...
+        image_url = await self._dalle_service.create(promt_str=image_prompt)
+        if image_url is None:
+            raise self.GenerateImageError
+        image_id = await self._download_image(image_url=image_url, image_name=f"{joke_id}.png")
+        joke_obj = joke_models.Joke(joke_id=joke_id, image_id=image_id)
+        async with self._session_maker() as session:
+            joke_result = await self._joke_repository.update(session, joke_obj)
+            await session.commit()
+        return joke_models.Joke(
+            joke_id=joke_result.joke_id,
+            text_final=joke_result.text_final,
+            image_id=f"{settings.MEMES_IMG_BASE_URL}/{joke_result.image_id}",
+        )
 
     async def _download_image(self, image_url: str, image_name: str) -> str:
-        image_path = pathlib.PurePath("/media/raid/memes_files", image_name)
+        image_path = pathlib.PurePath(settings.DALLE_IMG_DIR, image_name)
         async with self._provider.get(image_url) as response:
             if response.status != http.HTTPStatus.OK:
                 raise self.DownloadImageError
