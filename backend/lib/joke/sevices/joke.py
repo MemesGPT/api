@@ -67,7 +67,12 @@ class JokeService(JokeServiceProtocol):
 
     async def get_all(self) -> list[joke_models.Joke]:
         async with self._session_maker() as session:
-            return await self._joke_repository.get_all(session)
+            jokes = await self._joke_repository.get_all(session)
+            return [joke_models.Joke(
+                joke_id=joke.joke_id,
+                text_final=joke.text_final,
+                image_id=f"{settings.MEMES_IMG_BASE_URL}/{joke.image_id}" if joke.image_id else None,
+            ) for joke in jokes]
 
     async def get_by_id(
         self,
