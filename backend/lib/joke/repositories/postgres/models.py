@@ -13,6 +13,7 @@ class Joke(sqlalchemy_utils.Base):
         column_name="joke_id",
         column_type=sqlalchemy.UUID,
         primary_key=True,
+        default=uuid.uuid4,
     )
     text_final = sqlalchemy_utils.mapped_column(
         mapped_type=str,

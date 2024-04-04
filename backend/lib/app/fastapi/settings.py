@@ -39,13 +39,19 @@ class Settings(pydantic.BaseSettings):
     GIGACHAT_API_KEY: str
 
     # PostgreSQL
-
     PG_MASTER_HOST: str = "127.0.0.1"
     PG_MASTER_PORT: int = 50432
     POSTGRES_DB: str
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     PG_CONNECTION_POOL_SIZE: int = 100
+
+    # files path
+    DALLE_IMG_DIR: str = "/var/www/memes_images"
+    MEMES_IMG_BASE_URL: str
+
+    DEF_PAGE_NUMBER: int = 1
+    DEF_PAGE_SIZE: int = 50
 
     @property
     def is_development(self) -> bool:

@@ -23,6 +23,8 @@ langchain-community = "^0.0.28"
 langchain-openai = "^0.0.8"
 sqlalchemy = "^2.0.29"
 asyncpg = "^0.29.0"
+aiohttp = "^3.9.3"
+aiofiles = "^23.2.1"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -31,6 +33,7 @@ mypy = "^1.8.0"
 pytest = "^8.1.1"
 pytest-asyncio = "^0.23.5.post1"
 pytest-ruff = "^0.3.1"
+types-aiofiles = "^23.2.0.20240331"
 
 [build-system]
 requires = ["poetry-core"]
@@ -64,6 +67,9 @@ known-local-folder = []
 [tool.ruff.lint.flake8-type-checking]
 runtime-evaluated-decorators = ["pydantic.validate_call", "attrs.define"]
 runtime-evaluated-base-classes = ["pydantic.BaseModel"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.params.Depends", "fastapi.Query", "fastapi.params.Query"]
 
 [tool.mypy]
 mypy_path = "./"
