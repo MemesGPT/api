@@ -25,11 +25,6 @@ class Joke(sqlalchemy_utils.Base):
         column_name="image_id",
         column_type=sqlalchemy.String,
     )
-    test_field = sqlalchemy_utils.mapped_column(
-        mapped_type=str,
-        column_name="test_field",
-        column_type=sqlalchemy.String,
-    )
 
 
 __all__ = [
