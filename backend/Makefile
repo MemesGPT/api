@@ -62,4 +62,4 @@ dev-migrate:
 		POSTGRES_USER=$(POSTGRES_USER) \
 		POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) \
 		MEMES_IMG_BASE_URL=$(MEMES_IMG_BASE_URL) \
-		$(ALEMBIC) upgrade head
+		$(ALEMBIC) -c migrations/alembic.ini upgrade head

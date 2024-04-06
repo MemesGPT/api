@@ -21,9 +21,10 @@ RUN mkdir --parents /opt/backend
 COPY --from=builder /opt/backend/.venv /opt/backend/.venv
 COPY --from=builder /opt/backend/bin /opt/backend/bin
 COPY --from=builder /opt/backend/lib /opt/backend/lib
+COPY --from=builder /opt/backend/migrations /opt/backend/migrations
 
 RUN mkdir --parents /var/www/memes_images
 
 WORKDIR /opt/backend
-CMD .venv/bin/alembic upgrade head \
+CMD .venv/bin/alembic -c migrations/alembic.ini upgrade head \
     && .venv/bin/python -m bin.web
