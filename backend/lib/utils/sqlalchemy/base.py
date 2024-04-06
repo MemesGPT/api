@@ -39,4 +39,5 @@ class Base(metaclass=CustomBaseMetaclass):
 
 __all__ = [
     "Base",
+    "mapper_registry",
 ]

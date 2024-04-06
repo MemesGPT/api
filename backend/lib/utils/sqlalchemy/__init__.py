@@ -1,4 +1,4 @@
-from .base import Base
+from .base import Base, mapper_registry
 from .columns import mapped_column
 from .types import AsyncEngine, AsyncSession, AsyncSessionContext, AsyncSessionMaker
 
@@ -9,4 +9,5 @@ __all__ = [
     "AsyncSessionMaker",
     "Base",
     "mapped_column",
+    "mapper_registry",
 ]

@@ -25,7 +25,5 @@ COPY --from=builder /opt/backend/lib /opt/backend/lib
 RUN mkdir --parents /var/www/memes_images
 
 WORKDIR /opt/backend
-# TODO: Сделать миграции алимпиком
-#   https://github.com/MemesGPT/api/issues/42
-CMD .venv/bin/python -m bin.migrate \
+CMD .venv/bin/alembic upgrade head \
     && .venv/bin/python -m bin.web
