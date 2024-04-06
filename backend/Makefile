@@ -3,6 +3,7 @@ include $(ENVFILE)
 
 PENV = .venv
 PYTHON = $(PENV)/bin/python
+ALEMBIC = $(PENV)/bin/alembic
 
 
 PROJECT_FOLDERS = bin lib tests
@@ -31,6 +32,7 @@ dev-server-start:
 		POSTGRES_TEST_DB=$(POSTGRES_TEST_DB) \
 		POSTGRES_USER=$(POSTGRES_USER) \
 		POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) \
+		MEMES_IMG_BASE_URL=$(MEMES_IMG_BASE_URL) \
 		$(PYTHON) -m bin.web
 
 .PHONY: test
@@ -44,6 +46,7 @@ test:
 		POSTGRES_TEST_DB=$(POSTGRES_TEST_DB) \
 		POSTGRES_USER=$(POSTGRES_USER) \
 		POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) \
+		MEMES_IMG_BASE_URL=$(MEMES_IMG_BASE_URL) \
 		$(PYTHON) -m pytest tests -W ignore::DeprecationWarning
 
 
@@ -58,4 +61,5 @@ dev-migrate:
 		POSTGRES_TEST_DB=$(POSTGRES_TEST_DB) \
 		POSTGRES_USER=$(POSTGRES_USER) \
 		POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) \
-		$(PYTHON) -m bin.migrate
+		MEMES_IMG_BASE_URL=$(MEMES_IMG_BASE_URL) \
+		$(ALEMBIC) -c migrations/alembic.ini upgrade head

@@ -25,6 +25,8 @@ sqlalchemy = "^2.0.29"
 asyncpg = "^0.29.0"
 aiohttp = "^3.9.3"
 aiofiles = "^23.2.1"
+alembic = "^1.13.1"
+psycopg2-binary = "^2.9.9"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -44,6 +46,7 @@ exclude = [
     ".idea",
     ".git",
     ".venv",
+    "migrations",
 ]
 fix = true
 unsafe-fixes = false
